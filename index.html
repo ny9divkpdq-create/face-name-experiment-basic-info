@@ -2,58 +2,504 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>顔と名前の記憶実験（趣味・出身地グループ）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>顔と名前の記憶実験（基本情報グループ）</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;padding:16px;background:#f7f7f7;color:#111;text-align:center;font-family:system-ui,"Yu Gothic",Meiryo,sans-serif}
-main{max-width:720px;margin:auto;padding:clamp(16px,4vw,32px);background:white;border-radius:14px}
-h1{font-size:clamp(1.4rem,4vw,1.8rem)}p{line-height:1.7}.field{max-width:420px;margin:14px auto;text-align:left}label{display:block;font-weight:bold;margin-bottom:6px}
-input{width:100%;padding:12px;font-size:1rem;border:1px solid #aaa;border-radius:8px}
-button{margin-top:16px;padding:12px 24px;background:#1769aa;color:white;border:0;border-radius:8px;font-size:1rem;font-weight:bold}
-.face{width:min(300px,78vw);height:min(300px,78vw);object-fit:cover;border:1px solid #ddd}
-.counter{font-size:1.1rem}.person-name{font-size:clamp(1.5rem,5vw,2rem);font-weight:800;margin:18px 0 12px}.info{font-size:clamp(1.3rem,4vw,1.55rem);font-weight:800;margin:12px 0;line-height:1.6}
-.hidden{display:none!important}.note,.status{color:#444;font-size:.95rem}
+body {
+  font-family: sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 40px 20px;
+  background-color: white;
+}
+
+h1 { margin-bottom: 30px; }
+
+#instructions {
+  max-width: 700px;
+  margin: 0 auto 30px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  text-align: left;
+  line-height: 1.8;
+  background-color: #f8f8f8;
+  box-sizing: border-box;
+}
+
+#experiment, #test, #finish { display: none; }
+
+#photo, #testPhoto {
+  width: 300px;
+  height: 300px;
+  max-width: 90vw;
+  max-height: 90vw;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+#name {
+  font-size: 28px;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.basic-info {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.8;
+  margin-top: 12px;
+}
+
+#timer, #questionNumber {
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+#questionNumber { margin-bottom: 20px; }
+
+#answer, #studentNumber, #studentName {
+  width: 300px;
+  max-width: 90vw;
+  padding: 12px;
+  font-size: 20px;
+  box-sizing: border-box;
+}
+
+#answer { margin-top: 20px; }
+
+button {
+  font-size: 20px;
+  padding: 12px 30px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.input-area { margin-top: 25px; }
+.input-area p { margin-bottom: 8px; }
+.example { font-size: 16px; margin-top: 8px; }
+
+/\* ブラウザバック時の赤い警告画面 \*/
+#backWarning {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.82);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#backWarning .warning-box {
+  width: 100%;
+  max-width: 620px;
+  background: #fff;
+  border: 6px solid #8b0000;
+  border-radius: 8px;
+  padding: 28px 22px;
+  box-sizing: border-box;
+  box-shadow: 0 0 30px rgba(139, 0, 0, 0.65);
+}
+
+#backWarning .warning-title {
+  color: #8b0000;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0 0 18px;
+  letter-spacing: 0.04em;
+}
+
+#backWarning .warning-message {
+  color: #8b0000;
+  font-size: clamp(20px, 3.5vw, 28px);
+  font-weight: 900;
+  line-height: 1.8;
+  margin: 0;
+}
+
+#backWarning button {
+  background: #8b0000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  padding: 14px 28px;
+  margin-top: 24px;
+}
+
+@media (max-width: 480px) {
+  body { padding: 24px 12px; }
+
+  #photo, #testPhoto {
+    width: min(300px, 85vw);
+    height: min(300px, 85vw);
+  }
+
+  #backWarning .warning-box {
+    padding: 24px 16px;
+  }
+}
 </style>
 </head>
-<body><main>
-<section id="start-screen">
-<h1>顔と名前の記憶実験</h1><h2>趣味・出身地グループ</h2>
-<p>これから10人の顔写真・名前・趣味・出身地を順番に見てもらいます。<br>1人につき20秒間表示されます。よく見て覚えてください。<br>その後、顔写真を見て名前を答えるテストを行います。</p>
-<div class="field"><label for="student-number">学籍番号</label><input id="student-number" type="text" placeholder="例：5401" autocomplete="off"><p class="note">入力例：5年4組1番 → 5401</p></div>
-<div class="field"><label for="student-name">参加者名</label><input id="student-name" type="text" autocomplete="name"></div>
-<button id="start-button">実験開始</button><p id="start-status" class="status"></p>
-</section>
-<section id="study-screen" class="hidden">
-<p id="study-counter" class="counter">人物 1 / 10</p><img id="study-face" class="face" src="images/person01.jpg" alt="人物の顔写真">
-<div id="study-name" class="person-name"></div><p id="study-hobby" class="info"></p><p id="study-origin" class="info"></p><p id="study-timer"></p>
-</section>
-<section id="test-screen" class="hidden">
-<h1>名前のテスト</h1><p>写真の人物の名前を入力してください。<br>フルネームが思い出せない場合は、覚えている部分だけでも入力してください。</p>
-<p id="test-counter" class="counter"></p><img id="test-face" class="face" src="images/person01.jpg" alt="名前を答える人物の顔写真">
-<div class="field"><label for="answer">この人物の名前</label><input id="answer" type="text" autocomplete="off" placeholder="覚えている名前を入力"></div>
-<button id="next-button">次へ</button><p id="test-status" class="status"></p>
-</section>
-<section id="finish-screen" class="hidden"><h1>実験終了</h1><p>回答ありがとうございました。</p><p id="save-status" class="status">回答データを送信しています。</p></section>
-</main>
+
+<body>
+
+<!-- 最初の説明画面 -->
+<div id="start">
+  <h1>顔と名前の記憶実験（基本情報グループ）</h1>
+
+  <div id="instructions">
+    <h2>実験について</h2>
+
+    <p>
+      これから10名の顔写真と名前が順番に表示されます。
+      それぞれの顔と名前をできるだけ覚えてください。
+    </p>
+
+    <p>
+      学習が終了した後、顔写真を見て名前を回答する記憶テストを行います。
+      テストでは、顔写真がランダムな順番で表示されます。
+    </p>
+
+    <p>
+      回答はフルネームを完璧に答える必要はありません。
+      覚えている範囲で答えてください。
+      漢字表記が間違っていても構いません。
+      苗字と名前の間の半角スペースは無くても大丈夫です。
+    </p>
+
+    <p>
+      実験中は、できるだけ集中して取り組んでください。
+      一度実験を開始したら絶対に中断しないでください。
+    </p>
+
+    <p>実験の所要時間は約5分です。</p>
+  </div>
+
+  <div class="input-area">
+    <p><strong>学籍番号</strong></p>
+    <input type="text" id="studentNumber"
+      placeholder="学籍番号を入力してください">
+
+    <p class="example">例 5年5組1番 → 5501</p>
+    <p>白鷗高校及び附属中学校以外の方は「その他」と入力してください</p>
+
+    <p><strong>名前</strong></p>
+    <input type="text" id="studentName"
+      placeholder="名前を入力してください">
+  </div>
+
+  <button onclick="startExperiment()">実験開始</button>
+</div>
+
+<!-- 学習画面 -->
+<div id="experiment">
+  <p id="personNumber"></p>
+  <img id="photo" src="" alt="顔写真">
+  <div id="name"></div>
+  <div id="basicInfo" class="basic-info"></div>
+  <div id="timer"></div>
+</div>
+
+<!-- 記憶テスト画面 -->
+<div id="test">
+  <h1>記憶テスト</h1>
+  <div id="questionNumber"></div>
+  <p>この人の名前を入力してください。</p>
+  <img id="testPhoto" src="" alt="顔写真">
+  <br>
+  <input type="text" id="answer" placeholder="名前を入力してください">
+  <br>
+  <button onclick="nextQuestion()">次へ</button>
+</div>
+
+<!-- 終了画面 -->
+<div id="finish">
+  <h1>実験終了</h1>
+  <p>これで実験は終了です。</p>
+  <p>ご協力ありがとうございました。<br>タブは消去していただいて構いません。</p>
+</div>
+
+<!-- ブラウザバック時の警告画面 -->
+<div id="backWarning" role="alertdialog"
+  aria-modal="true" aria-labelledby="backWarningTitle">
+  <div class="warning-box">
+    <p id="backWarningTitle" class="warning-title">
+      実験を中断しないでください
+    </p>
+    <p class="warning-message">
+      まだ実験は終了していません。<br>
+      ブラウザの「戻る」操作は行わず、実験に戻ってください。
+    </p>
+    <button type="button" onclick="closeBackWarning()">実験に戻る</button>
+  </div>
+</div>
+
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwZbGbsraM6rRquxFgTEMJJwm_dJtQjCxIqudXlMOmXE-hj7M4x3exzfX6Zgn5t8qhh8w/exec";
+/\* 本実験用Googleスプレッドシートへの送信先 \*/
+const WEB_APP_URL =
+"https://script.google.com/macros/s/AKfycbwZbGbsraM6rRquxFgTEMJJwm_dJtQjCxIqudXlMOmXE-hj7M4x3exzfX6Zgn5t8qhh8w/exec";
+
+/\* 実験に使用する10人 \*/
 const people = [
-{id:"01",name:"岡田 綾乃",hobby:"読書",origin:"長野県",image:"images/person01.jpg"},
-{id:"02",name:"林 美穂",hobby:"写真撮影",origin:"福岡県",image:"images/person02.jpg"},
-{id:"03",name:"加藤 達也",hobby:"サッカー",origin:"静岡県",image:"images/person03.jpg"},
-{id:"04",name:"増田 正樹",hobby:"料理",origin:"北海道",image:"images/person04.jpg"},
-{id:"05",name:"笠原 光",hobby:"映画鑑賞",origin:"岡山県",image:"images/person05.jpg"},
-{id:"06",name:"本田 健司",hobby:"ゲーム",origin:"鹿児島県",image:"images/person06.jpg"},
-{id:"07",name:"鈴木 千鶴",hobby:"絵を描くこと",origin:"宮城県",image:"images/person07.jpg"},
-{id:"08",name:"浅野 俊彦",hobby:"音楽鑑賞",origin:"香川県",image:"images/person08.jpg"},
-{id:"09",name:"原 裕子",hobby:"旅行",origin:"石川県",image:"images/person09.jpg"},
-{id:"10",name:"須貝 みゆき",hobby:"ガーデニング",origin:"熊本県",image:"images/person10.jpg"}];
-const $=id=>document.getElementById(id);let studentNumber="",studentName="",studyIndex=0,testIndex=0,answers=[],timer=null;
-function showOnly(id){["start-screen","study-screen","test-screen","finish-screen"].forEach(s=>$(s).classList.toggle("hidden",s!==id))}
-function showStudy(){const p=people[studyIndex];$("study-counter").textContent=`人物 ${studyIndex+1} / 10`;$("study-face").src=p.image;$("study-name").textContent=p.name;$("study-hobby").textContent="趣味："+p.hobby;$("study-origin").textContent="出身地："+p.origin;let left=20;$("study-timer").textContent="次の人物まで："+left+"秒";if(timer)clearInterval(timer);timer=setInterval(()=>{left--;$("study-timer").textContent="次の人物まで："+left+"秒";if(left<=0){clearInterval(timer);timer=null;studyIndex++;if(studyIndex<people.length)showStudy();else startTest()}},1000)}
-function startTest(){showOnly("test-screen");testIndex=0;showTest()}
-function showTest(){const p=people[testIndex];$("test-counter").textContent=`人物 ${testIndex+1} / 10`;$("test-face").src=p.image;$("answer").value="";$("next-button").textContent=testIndex===9?"回答を送信して終了":"次へ";$("answer").focus()}
-$("start-button").onclick=()=>{studentNumber=$("student-number").value.trim();studentName=$("student-name").value.trim();if(!studentNumber||!studentName){alert("学籍番号と名前を入力してください。");return}if(WEB_APP_URL==="PASTE_YOUR_WEB_APP_URL_HERE"){alert("送信先URLがまだ設定されていません。スプレッドシートの準備後に設定します。");return}studyIndex=0;showOnly("study-screen");showStudy()};
-$("next-button").onclick=async()=>{answers.push($("answer").value.trim());if(testIndex<9){testIndex++;showTest();return}showOnly("finish-screen");const rows=answers.map((answer,i)=>({timestamp:new Date().toISOString(),studentNumber,studentName,personNumber:i+1,personId:people[i].id,correctName:people[i].name,answer,hobby:people[i].hobby,origin:people[i].origin}));try{await fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({condition:"趣味・出身地",rows})});$("save-status").textContent="回答データの送信処理を行いました。ご協力ありがとうございました。"}catch(e){$("save-status").textContent="回答の送信に失敗した可能性があります。実験担当者に知らせてください。"}};
-$("answer").addEventListener("keydown",e=>{if(e.key==="Enter")$("next-button").click()});
-</script></body></html>
+  {
+    id: "person01",
+    name: "岡田 綾乃",
+    hobby: "読書",
+    origin: "長野県",
+    image: "images/person01.jpg"
+  },
+  {
+    id: "person02",
+    name: "林 美穂",
+    hobby: "写真撮影",
+    origin: "福岡県",
+    image: "images/person02.jpg"
+  },
+  {
+    id: "person03",
+    name: "加藤 達也",
+    hobby: "サッカー",
+    origin: "静岡県",
+    image: "images/person03.jpg"
+  },
+  {
+    id: "person04",
+    name: "増田 正樹",
+    hobby: "料理",
+    origin: "北海道",
+    image: "images/person04.jpg"
+  },
+  {
+    id: "person05",
+    name: "笠原 光",
+    hobby: "映画鑑賞",
+    origin: "岡山県",
+    image: "images/person05.jpg"
+  },
+  {
+    id: "person06",
+    name: "本田 健司",
+    hobby: "ゲーム",
+    origin: "鹿児島県",
+    image: "images/person06.jpg"
+  },
+  {
+    id: "person07",
+    name: "鈴木 千鶴",
+    hobby: "絵を描くこと",
+    origin: "宮城県",
+    image: "images/person07.jpg"
+  },
+  {
+    id: "person08",
+    name: "浅野 俊彦",
+    hobby: "音楽鑑賞",
+    origin: "香川県",
+    image: "images/person08.jpg"
+  },
+  {
+    id: "person09",
+    name: "原 裕子",
+    hobby: "旅行",
+    origin: "石川県",
+    image: "images/person09.jpg"
+  },
+  {
+    id: "person10",
+    name: "須貝 みゆき",
+    hobby: "ガーデニング",
+    origin: "熊本県",
+    image: "images/person10.jpg",
+  }
+];
+
+const displayTime = 20;
+let currentPerson = 0;
+let remainingTime = displayTime;
+let timer;
+let currentQuestion = 0;
+let testPeople = [];
+let answers = Array(people.length).fill("");
+let experimentStarted = false;
+
+/\* ブラウザバック対策 \*/
+function protectBackButton() {
+  history.pushState({ experimentGuard: true }, "", location.href);
+}
+
+function closeBackWarning() {
+  document.getElementById("backWarning").style.display = "none";
+}
+
+window\.addEventListener("popstate", function () {
+  if (experimentStarted) {
+    document.getElementById("backWarning").style.display = "flex";
+    protectBackButton();
+  }
+});
+
+/\* 再読み込み・タブを閉じる操作への標準警告 \*/
+window\.addEventListener("beforeunload", function (event) {
+  if (experimentStarted) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
+
+/\* 実験開始 \*/
+function startExperiment() {
+  const studentNumber =
+    document.getElementById("studentNumber").value.trim();
+  const studentName =
+    document.getElementById("studentName").value.trim();
+
+  if (studentNumber === "" || studentName === "") {
+    alert("学籍番号と名前を入力してください。");
+    return;
+  }
+
+  experimentStarted = true;
+  protectBackButton();
+
+  document.getElementById("start").style.display = "none";
+  document.getElementById("experiment").style.display = "block";
+
+  currentPerson = 0;
+  showPerson();
+  clearInterval(timer);
+  timer = setInterval(countDown, 1000);
+}
+
+/\* 学習画面に人物・名前を表示 \*/
+function showPerson() {
+  const person = people[currentPerson];
+
+  document.getElementById("photo").src = person.image;
+  document.getElementById("name").textContent = person.name;
+  document.getElementById("basicInfo").innerHTML =
+    "趣味：" + person.hobby + "<br>出身地：" + person.origin;
+  document.getElementById("personNumber").textContent =
+    "人物 " + (currentPerson + 1) + " / " + people.length;
+
+  remainingTime = displayTime;
+  document.getElementById("timer").textContent =
+    "次の人物まで：" + remainingTime + "秒";
+}
+
+/\* カウントダウン \*/
+function countDown() {
+  remainingTime--;
+
+  document.getElementById("timer").textContent =
+    "次の人物まで：" + remainingTime + "秒";
+
+  if (remainingTime <= 0) {
+    currentPerson++;
+
+    if (currentPerson >= people.length) {
+      clearInterval(timer);
+      startTest();
+      return;
+    }
+
+    showPerson();
+  }
+}
+
+/\* 記憶テスト開始・出題順をランダムにする \*/
+function startTest() {
+  document.getElementById("experiment").style.display = "none";
+  document.getElementById("test").style.display = "block";
+
+  testPeople = [...people];
+
+  for (let i = testPeople.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() \* (i + 1));
+    [testPeople[i], testPeople[j]] =
+      [testPeople[j], testPeople[i]];
+  }
+
+  currentQuestion = 0;
+  answers = Array(people.length).fill("");
+  showQuestion();
+}
+
+/\* 問題を表示。テスト時にはエピソードを表示しない \*/
+function showQuestion() {
+  const person = testPeople[currentQuestion];
+
+  document.getElementById("testPhoto").src = person.image;
+  document.getElementById("questionNumber").textContent =
+    "問題 " + (currentQuestion + 1) + " / " + testPeople.length;
+
+  document.getElementById("answer").value = "";
+  document.getElementById("answer").focus();
+}
+
+/\* 次の問題 \*/
+function nextQuestion() {
+  const person = testPeople[currentQuestion];
+  const answer = document.getElementById("answer").value.trim();
+
+  /\* 表示順はランダムでも、回答は元の人物ID順に保存 \*/
+  const originalIndex = people.findIndex(function (item) {
+    return item.id === person.id;
+  });
+  answers[originalIndex] = answer;
+
+  currentQuestion++;
+
+  if (currentQuestion >= testPeople.length) {
+    document.getElementById("test").style.display = "none";
+    experimentStarted = false;
+    clearInterval(timer);
+
+    sendAnswers();
+    document.getElementById("finish").style.display = "block";
+    return;
+  }
+
+  showQuestion();
+}
+
+/\* Googleスプレッドシートへ回答を送信 \*/
+function sendAnswers() {
+  const studentNumber =
+    document.getElementById("studentNumber").value.trim();
+  const studentName =
+    document.getElementById("studentName").value.trim();
+
+  const rows = people.map(function (person, index) {
+    return {
+      studentNumber: studentNumber,
+      studentName: studentName,
+      personNumber: index + 1,
+      personId: person.id,
+      correctName: person.name,
+      answer: answers[index],
+      hobby: person.hobby,
+      origin: person.origin
+    };
+  });
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      condition: "基本情報（趣味・出身地）",
+      rows: rows
+    })
+  });
+}
+</script>
+
+</body>
+</html>
