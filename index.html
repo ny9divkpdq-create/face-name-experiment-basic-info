@@ -80,7 +80,7 @@ button {
 .input-area p { margin-bottom: 8px; }
 .example { font-size: 16px; margin-top: 8px; }
 
-/\* ブラウザバック時の赤い警告画面 \*/
+/* ブラウザバック時の赤い警告画面 */
 #backWarning {
   display: none;
   position: fixed;
@@ -225,7 +225,7 @@ button {
 </div>
 
 <!-- ブラウザバック時の警告画面 -->
-<div id="backWarning" role="alertdialog"
+<div id="backWarning" style="display:none" role="alertdialog"
   aria-modal="true" aria-labelledby="backWarningTitle">
   <div class="warning-box">
     <p id="backWarningTitle" class="warning-title">
@@ -240,11 +240,11 @@ button {
 </div>
 
 <script>
-/\* 本実験用Googleスプレッドシートへの送信先 \*/
+/* 本実験用Googleスプレッドシートへの送信先 */
 const WEB_APP_URL =
 "https://script.google.com/macros/s/AKfycbwZbGbsraM6rRquxFgTEMJJwm_dJtQjCxIqudXlMOmXE-hj7M4x3exzfX6Zgn5t8qhh8w/exec";
 
-/\* 実験に使用する10人 \*/
+/* 実験に使用する10人 */
 const people = [
   {
     id: "person01",
@@ -327,7 +327,7 @@ let testPeople = [];
 let answers = Array(people.length).fill("");
 let experimentStarted = false;
 
-/\* ブラウザバック対策 \*/
+/* ブラウザバック対策 */
 function protectBackButton() {
   history.pushState({ experimentGuard: true }, "", location.href);
 }
@@ -336,22 +336,22 @@ function closeBackWarning() {
   document.getElementById("backWarning").style.display = "none";
 }
 
-window\.addEventListener("popstate", function () {
+window.addEventListener("popstate", function () {
   if (experimentStarted) {
     document.getElementById("backWarning").style.display = "flex";
     protectBackButton();
   }
 });
 
-/\* 再読み込み・タブを閉じる操作への標準警告 \*/
-window\.addEventListener("beforeunload", function (event) {
+/* 再読み込み・タブを閉じる操作への標準警告 */
+window.addEventListener("beforeunload", function (event) {
   if (experimentStarted) {
     event.preventDefault();
     event.returnValue = "";
   }
 });
 
-/\* 実験開始 \*/
+/* 実験開始 */
 function startExperiment() {
   const studentNumber =
     document.getElementById("studentNumber").value.trim();
@@ -363,6 +363,7 @@ function startExperiment() {
     return;
   }
 
+  document.getElementById("backWarning").style.display = "none";
   experimentStarted = true;
   protectBackButton();
 
@@ -375,7 +376,7 @@ function startExperiment() {
   timer = setInterval(countDown, 1000);
 }
 
-/\* 学習画面に人物・名前を表示 \*/
+/* 学習画面に人物・名前を表示 */
 function showPerson() {
   const person = people[currentPerson];
 
@@ -391,7 +392,7 @@ function showPerson() {
     "次の人物まで：" + remainingTime + "秒";
 }
 
-/\* カウントダウン \*/
+/* カウントダウン */
 function countDown() {
   remainingTime--;
 
@@ -411,7 +412,7 @@ function countDown() {
   }
 }
 
-/\* 記憶テスト開始・出題順をランダムにする \*/
+/* 記憶テスト開始・出題順をランダムにする */
 function startTest() {
   document.getElementById("experiment").style.display = "none";
   document.getElementById("test").style.display = "block";
@@ -419,7 +420,7 @@ function startTest() {
   testPeople = [...people];
 
   for (let i = testPeople.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() \* (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [testPeople[i], testPeople[j]] =
       [testPeople[j], testPeople[i]];
   }
@@ -429,7 +430,7 @@ function startTest() {
   showQuestion();
 }
 
-/\* 問題を表示。テスト時にはエピソードを表示しない \*/
+/* 問題を表示。テスト時にはエピソードを表示しない */
 function showQuestion() {
   const person = testPeople[currentQuestion];
 
@@ -441,12 +442,12 @@ function showQuestion() {
   document.getElementById("answer").focus();
 }
 
-/\* 次の問題 \*/
+/* 次の問題 */
 function nextQuestion() {
   const person = testPeople[currentQuestion];
   const answer = document.getElementById("answer").value.trim();
 
-  /\* 表示順はランダムでも、回答は元の人物ID順に保存 \*/
+  /* 表示順はランダムでも、回答は元の人物ID順に保存 */
   const originalIndex = people.findIndex(function (item) {
     return item.id === person.id;
   });
@@ -467,7 +468,7 @@ function nextQuestion() {
   showQuestion();
 }
 
-/\* Googleスプレッドシートへ回答を送信 \*/
+/* Googleスプレッドシートへ回答を送信 */
 function sendAnswers() {
   const studentNumber =
     document.getElementById("studentNumber").value.trim();
